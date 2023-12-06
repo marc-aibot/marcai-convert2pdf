@@ -1,6 +1,8 @@
 import express from "express";
 import puppeteer from 'puppeteer';
 import json from "body-parser";
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 const port = 5000;
@@ -13,8 +15,8 @@ app.post("/convertToPDF", async (req, res) => {
     const { html } = req.body;
 
     const browser = await puppeteer.launch({
-        headless: 'new',
-      });
+      headless: true,
+    });
     const page = await browser.newPage();
 
     // Set content and wait for rendering
@@ -26,14 +28,23 @@ app.post("/convertToPDF", async (req, res) => {
     // Close the browser
     await browser.close();
 
-    // Send the PDF as a response
-    res.contentType("application/pdf");
-    res.send(pdfBuffer);
+    // Save the PDF to a file
+    const currentDir = path.dirname(new URL(import.meta.url).pathname);
+    const pdfPath = path.join(currentDir, 'output.pdf');
+    fs.writeFileSync(pdfPath, pdfBuffer);
+
+    // Send the link to the saved PDF as a response
+    const pdfUrl = `https://converttopdf.onrender.com/output.pdf`;
+    res.json({ pdfUrl });
   } catch (error) {
     console.error("Error converting to PDF:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Serve static files (PDF in this case)
+const currentDir = path.dirname(new URL(import.meta.url).pathname);
+app.use(express.static(currentDir));
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -15,7 +15,7 @@ app.post("/convertToPDF", async (req, res) => {
     const { html } = req.body;
 
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: "new",
     });
     const page = await browser.newPage();
 

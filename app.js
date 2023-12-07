@@ -1,8 +1,8 @@
 import express from "express";
-import puppeteer from 'puppeteer';
+import { chromium } from "playwright";
 import json from "body-parser";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 const app = express();
 const port = 5000;
@@ -14,9 +14,7 @@ app.post("/convertToPDF", async (req, res) => {
   try {
     const { html } = req.body;
 
-    const browser = await puppeteer.launch({
-      headless: "new",
-    });
+    const browser = await chromium.launch();
     const page = await browser.newPage();
 
     // Set content and wait for rendering
@@ -29,8 +27,8 @@ app.post("/convertToPDF", async (req, res) => {
     await browser.close();
 
     // Save the PDF to a file
-    const currentDir = path.dirname(new URL(import.meta.url).pathname);puppeteer.config
-    const pdfPath = path.join(currentDir, 'output.pdf');
+    const currentDir = path.dirname(new URL(import.meta.url).pathname);
+    const pdfPath = path.join(currentDir, "output.pdf");
     fs.writeFileSync(pdfPath, pdfBuffer);
 
     // Send the link to the saved PDF as a response

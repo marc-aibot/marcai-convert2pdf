@@ -12,7 +12,7 @@ app.use(json());
 
 app.post("/convertToPDF", async (req, res) => {
   try {
-    const { html } = req.body;
+    const { html, name } = req.body;
 
     const browser = await chromium.launch();
     const page = await browser.newPage();
@@ -28,11 +28,11 @@ app.post("/convertToPDF", async (req, res) => {
 
     // Save the PDF to a file
     const currentDir = path.dirname(new URL(import.meta.url).pathname);
-    const pdfPath = path.join(currentDir, "output.pdf");
+    const pdfPath = path.join(currentDir, `${name}.pdf`);
     fs.writeFileSync(pdfPath, pdfBuffer);
 
     // Send the link to the saved PDF as a response
-    const pdfUrl = `https://converttopdf.onrender.com/output.pdf`;
+    const pdfUrl = `https://converttopdf.onrender.com/${name}.pdf`;
     res.json({ pdfUrl });
   } catch (error) {
     console.error("Error converting to PDF:", error);

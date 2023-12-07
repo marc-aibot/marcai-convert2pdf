@@ -29,7 +29,7 @@ app.post("/convertToPDF", async (req, res) => {
     await browser.close();
 
     // Save the PDF to a file
-    const currentDir = path.dirname(new URL(import.meta.url).pathname);
+    const currentDir = path.dirname(new URL(import.meta.url).pathname);puppeteer.config
     const pdfPath = path.join(currentDir, 'output.pdf');
     fs.writeFileSync(pdfPath, pdfBuffer);
 
